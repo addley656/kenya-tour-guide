@@ -6,7 +6,7 @@ const mongoose = require("mongoose");
 
 const app = express();
 
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 
 /* Middleware */
 
@@ -17,6 +17,9 @@ app.use(express.json());
 /* MongoDB Connection */
 
 mongoose.connect(process.env.MONGO_URI)
+
+.then(function() {
+
     console.log("MongoDB Connected 🚀");
 
 })
@@ -75,6 +78,7 @@ app.post("/bookings", async function(req, res) {
     });
 
 });
+
 /* Delete Booking */
 
 app.delete("/bookings/:id", async function(req, res) {
@@ -86,10 +90,29 @@ app.delete("/bookings/:id", async function(req, res) {
     });
 
 });
+
+/* Update Booking */
+
+app.put("/bookings/:id", async function(req, res) {
+
+    const updatedBooking = await Booking.findByIdAndUpdate(
+
+        req.params.id,
+
+        req.body,
+
+        { new: true }
+
+    );
+
+    res.json(updatedBooking);
+
+});
+
 /* Start Server */
 
 app.listen(PORT, function() {
 
     console.log(`Server running on port ${PORT}`);
 
-})
+});
