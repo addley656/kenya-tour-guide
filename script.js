@@ -10,7 +10,7 @@ const bookingList = document.getElementById("bookingList");
 
 window.onload = async function () {
 
-    const response = await fetch("https://YOUR-RENDER-URL.onrender.com/bookings");
+    const response = await fetch("https://kenya-tour-guide-backend.onrender.com/bookings")
 
     const bookings = await response.json();
 
@@ -40,7 +40,7 @@ form.addEventListener("submit", async function (event) {
         date: date
     };
 
-    const response = await fetch("https://YOUR-RENDER-URL.onrender.com/bookings", {
+    const response = await fetch("https://kenya-tour-guide-backend.onrender.com/bookings", {
 
         method: "POST",
 
@@ -101,7 +101,7 @@ async function deleteBooking(id, button) {
         return;
     }
 
-    await fetch(`https://YOUR-RENDER-URL.onrender.com/bookings/${id}`, {
+    await fetch(`https://kenya-tour-guide-backend.onrender.com/bookings/${id}`, {
 
         method: "DELETE"
 
@@ -127,7 +127,7 @@ async function editBooking(id, oldName, oldDestination, oldDate) {
         date: newDate
     };
 
-    await fetch(`https://YOUR-RENDER-URL.onrender.com/bookings/${id}`, {
+    await fetch(`https://kenya-tour-guide-backend.onrender.com/bookings/${id}`, {
 
         method: "PUT",
 
