@@ -16,9 +16,7 @@ app.use(express.json());
 
 /* MongoDB Connection */
 
-mongoose.connect("mongodb://kenyauser:Kenya12345@ac-ae8vyaf-shard-00-00.hvop6k1.mongodb.net:27017,ac-ae8vyaf-shard-00-01.hvop6k1.mongodb.net:27017,ac-ae8vyaf-shard-00-02.hvop6k1.mongodb.net:27017/?ssl=true&replicaSet=atlas-111goq-shard-0&authSource=admin&appName=Cluster0")
-.then(function() {
-
+mongoose.connect(process.env.MONGO_URI)
     console.log("MongoDB Connected 🚀");
 
 })
