@@ -1,4 +1,3 @@
-
 function showMessage() {
     alert("Welcome to Kenya Tour Guide Booking!");
 }
@@ -7,11 +6,11 @@ const form = document.getElementById("bookingForm");
 
 const bookingList = document.getElementById("bookingList");
 
-/* Load bookings from backend */
+/* Load Bookings */
 
 window.onload = async function () {
 
-    const response = await fetch("http://localhost:3000/bookings");
+    const response = await fetch("https://YOUR-RENDER-URL.onrender.com/bookings");
 
     const bookings = await response.json();
 
@@ -35,13 +34,13 @@ form.addEventListener("submit", async function (event) {
 
     const date = document.getElementById("date").value;
 
-    const bookingData = {
-        name,
-        destination,
-        date
+    const booking = {
+        name: name,
+        destination: destination,
+        date: date
     };
 
-    const response = await fetch("http://localhost:3000/bookings", {
+    const response = await fetch("https://YOUR-RENDER-URL.onrender.com/bookings", {
 
         method: "POST",
 
@@ -49,7 +48,7 @@ form.addEventListener("submit", async function (event) {
             "Content-Type": "application/json"
         },
 
-        body: JSON.stringify(bookingData)
+        body: JSON.stringify(booking)
 
     });
 
@@ -69,24 +68,24 @@ function displayBooking(booking) {
 
     div.classList.add("booking-card");
 
-   div.innerHTML = `
-    <h3>${booking.name}</h3>
-    <p>Destination: ${booking.destination}</p>
-    <p>Date: ${booking.date}</p>
+    div.innerHTML = `
+        <h3>${booking.name}</h3>
+        <p>Destination: ${booking.destination}</p>
+        <p>Date: ${booking.date}</p>
 
-    <button onclick="editBooking(
-        '${booking._id}',
-        '${booking.name}',
-        '${booking.destination}',
-        '${booking.date}'
-    )">
-        Edit
-    </button>
+        <button onclick="editBooking(
+            '${booking._id}',
+            '${booking.name}',
+            '${booking.destination}',
+            '${booking.date}'
+        )">
+            Edit
+        </button>
 
-    <button onclick="deleteBooking('${booking._id}', this)">
-        Delete
-    </button>
-`;
+        <button onclick="deleteBooking('${booking._id}', this)">
+            Delete
+        </button>
+    `;
 
     bookingList.appendChild(div);
 
@@ -96,7 +95,13 @@ function displayBooking(booking) {
 
 async function deleteBooking(id, button) {
 
-    await fetch(`http://localhost:3000/bookings/${id}`, {
+    const confirmDelete = confirm("Are you sure you want to delete this booking?");
+
+    if (!confirmDelete) {
+        return;
+    }
+
+    await fetch(`https://YOUR-RENDER-URL.onrender.com/bookings/${id}`, {
 
         method: "DELETE"
 
@@ -104,7 +109,9 @@ async function deleteBooking(id, button) {
 
     button.parentElement.remove();
 
-}/* Edit Booking */
+}
+
+/* Edit Booking */
 
 async function editBooking(id, oldName, oldDestination, oldDate) {
 
@@ -120,7 +127,7 @@ async function editBooking(id, oldName, oldDestination, oldDate) {
         date: newDate
     };
 
-    await fetch(`http://localhost:3000/bookings/${id}`, {
+    await fetch(`https://YOUR-RENDER-URL.onrender.com/bookings/${id}`, {
 
         method: "PUT",
 
