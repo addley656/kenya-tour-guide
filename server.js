@@ -1,118 +1,203 @@
-const express = require("express");
+function showMessage() {
+    alert("Welcome to Kenya Tour Guide Booking!");
+}
 
-const cors = require("cors");
+const form = document.getElementById("bookingForm");
 
-const mongoose = require("mongoose");
+const bookingList = document.getElementById("bookingList");
 
-const app = express();
+/* YOUR RENDER BACKEND URL */
+const API_URL = "https://kenya-tour-guide-backend.onrender.com";
 
-const PORT = process.env.PORT || 3000;
+/* LOAD BOOKINGS */
 
-/* Middleware */
+window.onload = async function () {
 
-app.use(cors());
+    try {
 
-app.use(express.json());
+        const response = await fetch(`${API_URL}/bookings`);
 
-/* MongoDB Connection */
+        const bookings = await response.json();
 
-mongoose.connect(process.env.MONGO_URI)
+        bookingList.innerHTML = "";
 
-.then(function() {
+        bookings.forEach(function (booking) {
 
-    console.log("MongoDB Connected 🚀");
+            displayBooking(booking);
 
-})
+        });
 
-.catch(function(error) {
+    } catch (error) {
 
-    console.log(error);
+        console.log("Error loading bookings:", error);
 
-});
+    }
 
-/* Booking Schema */
+};
 
-const bookingSchema = new mongoose.Schema({
+/* CREATE BOOKING */
 
-    name: String,
+form.addEventListener("submit", async function (event) {
 
-    destination: String,
+    event.preventDefault();
 
-    date: String
+    const name = document.getElementById("name").value;
 
-});
+    const destination = document.getElementById("destination").value;
 
-/* Booking Model */
+    const date = document.getElementById("date").value;
 
-const Booking = mongoose.model("Booking", bookingSchema);
+    const booking = {
+        name: name,
+        destination: destination,
+        date: date
+    };
 
-/* Home Route */
+    try {
 
-app.get("/", function(req, res) {
+        const response = await fetch(`${API_URL}/bookings`, {
 
-    res.send("Kenya Tour Backend Running 🚀");
+            method: "POST",
 
-});
+            headers: {
+                "Content-Type": "application/json"
+            },
 
-/* Get Bookings */
+            body: JSON.stringify(booking)
 
-app.get("/bookings", async function(req, res) {
+        });
 
-    const bookings = await Booking.find();
+        const data = await response.json();
 
-    res.json(bookings);
+        displayBooking(data.booking);
 
-});
+        form.reset();
 
-/* Create Booking */
+        alert("Booking Added Successfully!");
 
-app.post("/bookings", async function(req, res) {
+    } catch (error) {
 
-    const booking = new Booking(req.body);
+        console.log("Error creating booking:", error);
 
-    await booking.save();
-
-    res.json({
-        message: "Booking Saved!",
-        booking: booking
-    });
-
-});
-
-/* Delete Booking */
-
-app.delete("/bookings/:id", async function(req, res) {
-
-    await Booking.findByIdAndDelete(req.params.id);
-
-    res.json({
-        message: "Booking Deleted"
-    });
+    }
 
 });
 
-/* Update Booking */
+/* DISPLAY BOOKING */
 
-app.put("/bookings/:id", async function(req, res) {
+function displayBooking(booking) {
 
-    const updatedBooking = await Booking.findByIdAndUpdate(
+    const div = document.createElement("div");
 
-        req.params.id,
+    div.classList.add("booking-card");
 
-        req.body,
+    div.innerHTML = `
+    
+        <h3>${booking.name}</h3>
 
-        { new: true }
+        <p><strong>Destination:</strong> ${booking.destination}</p>
 
-    );
+        <p><strong>Date:</strong> ${booking.date}</p>
 
-    res.json(updatedBooking);
+        <button onclick="editBooking(
+            '${booking._id}',
+            '${booking.name}',
+            '${booking.destination}',
+            '${booking.date}'
+        )">
+            Edit
+        </button>
 
-});
+        <button onclick="deleteBooking('${booking._id}', this)">
+            Delete
+        </button>
 
-/* Start Server */
+    `;
 
-app.listen(PORT, function() {
+    bookingList.appendChild(div);
 
-    console.log(`Server running on port ${PORT}`);
+}
 
-});
+/* DELETE BOOKING */
+
+async function deleteBooking(id, button) {
+
+    const confirmDelete = confirm("Are you sure you want to delete this booking?");
+
+    if (!confirmDelete) {
+
+        return;
+
+    }
+
+    try {
+
+        await fetch(`${API_URL}/bookings/${id}`, {
+
+            method: "DELETE"
+
+        });
+
+        button.parentElement.remove();
+
+        alert("Booking Deleted!");
+
+    } catch (error) {
+
+        console.log("Error deleting booking:", error);
+
+    }
+
+}
+
+/* EDIT BOOKING */
+
+async function editBooking(id, oldName, oldDestination, oldDate) {
+
+    const newName = prompt("Enter new name:", oldName);
+
+    const newDestination = prompt("Enter new destination:", oldDestination);
+
+    const newDate = prompt("Enter new date:", oldDate);
+
+    if (!newName || !newDestination || !newDate) {
+
+        return;
+
+    }
+
+    const updatedBooking = {
+
+        name: newName,
+
+        destination: newDestination,
+
+        date: newDate
+
+    };
+
+    try {
+
+        await fetch(`${API_URL}/bookings/${id}`, {
+
+            method: "PUT",
+
+            headers: {
+                "Content-Type": "application/json"
+            },
+
+            body: JSON.stringify(updatedBooking)
+
+        });
+
+        alert("Booking Updated!");
+
+        location.reload();
+
+    } catch (error) {
+
+        console.log("Error updating booking:", error);
+
+    }
+
+}
