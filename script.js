@@ -6,13 +6,17 @@ const form = document.getElementById("bookingForm");
 
 const bookingList = document.getElementById("bookingList");
 
-/* Load Bookings */
+const API_URL = "https://kenya-tour-guide-backend.onrender.com";
+
+/* LOAD BOOKINGS */
 
 window.onload = async function () {
 
-    const response = await fetch("https://kenya-tour-guide-backend.onrender.com/bookings")
+    const response = await fetch(`${API_URL}/bookings`);
 
     const bookings = await response.json();
+
+    bookingList.innerHTML = "";
 
     bookings.forEach(function (booking) {
 
@@ -22,7 +26,7 @@ window.onload = async function () {
 
 };
 
-/* Submit Booking */
+/* CREATE BOOKING */
 
 form.addEventListener("submit", async function (event) {
 
@@ -35,12 +39,12 @@ form.addEventListener("submit", async function (event) {
     const date = document.getElementById("date").value;
 
     const booking = {
-        name: name,
-        destination: destination,
-        date: date
+        name,
+        destination,
+        date
     };
 
-    const response = await fetch("https://kenya-tour-guide-backend.onrender.com/bookings", {
+    const response = await fetch(`${API_URL}/bookings`, {
 
         method: "POST",
 
@@ -60,7 +64,7 @@ form.addEventListener("submit", async function (event) {
 
 });
 
-/* Display Booking */
+/* DISPLAY BOOKING */
 
 function displayBooking(booking) {
 
@@ -69,8 +73,11 @@ function displayBooking(booking) {
     div.classList.add("booking-card");
 
     div.innerHTML = `
+
         <h3>${booking.name}</h3>
+
         <p>Destination: ${booking.destination}</p>
+
         <p>Date: ${booking.date}</p>
 
         <button onclick="editBooking(
@@ -85,23 +92,18 @@ function displayBooking(booking) {
         <button onclick="deleteBooking('${booking._id}', this)">
             Delete
         </button>
+
     `;
 
     bookingList.appendChild(div);
 
 }
 
-/* Delete Booking */
+/* DELETE BOOKING */
 
 async function deleteBooking(id, button) {
 
-    const confirmDelete = confirm("Are you sure you want to delete this booking?");
-
-    if (!confirmDelete) {
-        return;
-    }
-
-    await fetch(`https://kenya-tour-guide-backend.onrender.com/bookings/${id}`, {
+    await fetch(`${API_URL}/bookings/${id}`, {
 
         method: "DELETE"
 
@@ -111,7 +113,7 @@ async function deleteBooking(id, button) {
 
 }
 
-/* Edit Booking */
+/* EDIT BOOKING */
 
 async function editBooking(id, oldName, oldDestination, oldDate) {
 
@@ -122,12 +124,16 @@ async function editBooking(id, oldName, oldDestination, oldDate) {
     const newDate = prompt("Enter new date:", oldDate);
 
     const updatedBooking = {
+
         name: newName,
+
         destination: newDestination,
+
         date: newDate
+
     };
 
-    await fetch(`https://kenya-tour-guide-backend.onrender.com/bookings/${id}`, {
+    await fetch(`${API_URL}/bookings/${id}`, {
 
         method: "PUT",
 
