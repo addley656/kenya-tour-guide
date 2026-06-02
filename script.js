@@ -3,39 +3,34 @@ function showMessage() {
 }
 
 const form = document.getElementById("bookingForm");
-
 const bookingList = document.getElementById("bookingList");
 
-const API_URL = "https://kenya-tour-guide-backend.onrender.com";
+/* YOUR RENDER BACKEND URL */
+const API_URL = "https://kenya-tour-guide.onrender.com";
 
 /* LOAD BOOKINGS */
-
 window.onload = async function () {
+    try {
+        const response = await fetch(`${API_URL}/bookings`);
+        const bookings = await response.json();
 
-    const response = await fetch(`${API_URL}/bookings`);
+        bookingList.innerHTML = "";
 
-    const bookings = await response.json();
+        bookings.forEach(function (booking) {
+            displayBooking(booking);
+        });
 
-    bookingList.innerHTML = "";
-
-    bookings.forEach(function (booking) {
-
-        displayBooking(booking);
-
-    });
-
+    } catch (error) {
+        console.log("Error loading bookings:", error);
+    }
 };
 
 /* CREATE BOOKING */
-
 form.addEventListener("submit", async function (event) {
-
     event.preventDefault();
 
     const name = document.getElementById("name").value;
-
     const destination = document.getElementById("destination").value;
-
     const date = document.getElementById("date").value;
 
     const booking = {
@@ -44,41 +39,38 @@ form.addEventListener("submit", async function (event) {
         date
     };
 
-    const response = await fetch(`${API_URL}/bookings`, {
+    try {
+        const response = await fetch(`${API_URL}/bookings`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(booking)
+        });
 
-        method: "POST",
+        const data = await response.json();
 
-        headers: {
-            "Content-Type": "application/json"
-        },
+        displayBooking(data.booking);
 
-        body: JSON.stringify(booking)
+        form.reset();
 
-    });
+        alert("Booking Added Successfully!");
 
-    const data = await response.json();
-
-    displayBooking(data.booking);
-
-    form.reset();
-
+    } catch (error) {
+        console.log("Error creating booking:", error);
+    }
 });
 
 /* DISPLAY BOOKING */
-
 function displayBooking(booking) {
-
     const div = document.createElement("div");
 
     div.classList.add("booking-card");
 
     div.innerHTML = `
-
         <h3>${booking.name}</h3>
-
-        <p>Destination: ${booking.destination}</p>
-
-        <p>Date: ${booking.date}</p>
+        <p><strong>Destination:</strong> ${booking.destination}</p>
+        <p><strong>Date:</strong> ${booking.date}</p>
 
         <button onclick="editBooking(
             '${booking._id}',
@@ -92,59 +84,64 @@ function displayBooking(booking) {
         <button onclick="deleteBooking('${booking._id}', this)">
             Delete
         </button>
-
     `;
 
     bookingList.appendChild(div);
-
 }
 
 /* DELETE BOOKING */
-
 async function deleteBooking(id, button) {
+    const confirmDelete = confirm("Are you sure you want to delete this booking?");
 
-    await fetch(`${API_URL}/bookings/${id}`, {
+    if (!confirmDelete) {
+        return;
+    }
 
-        method: "DELETE"
+    try {
+        await fetch(`${API_URL}/bookings/${id}`, {
+            method: "DELETE"
+        });
 
-    });
+        button.parentElement.remove();
 
-    button.parentElement.remove();
+        alert("Booking Deleted!");
 
+    } catch (error) {
+        console.log("Error deleting booking:", error);
+    }
 }
 
 /* EDIT BOOKING */
-
 async function editBooking(id, oldName, oldDestination, oldDate) {
 
     const newName = prompt("Enter new name:", oldName);
-
     const newDestination = prompt("Enter new destination:", oldDestination);
-
     const newDate = prompt("Enter new date:", oldDate);
 
+    if (!newName || !newDestination || !newDate) {
+        return;
+    }
+
     const updatedBooking = {
-
         name: newName,
-
         destination: newDestination,
-
         date: newDate
-
     };
 
-    await fetch(`${API_URL}/bookings/${id}`, {
+    try {
+        await fetch(`${API_URL}/bookings/${id}`, {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(updatedBooking)
+        });
 
-        method: "PUT",
+        alert("Booking Updated!");
 
-        headers: {
-            "Content-Type": "application/json"
-        },
+        location.reload();
 
-        body: JSON.stringify(updatedBooking)
-
-    });
-
-    location.reload();
-
+    } catch (error) {
+        console.log("Error updating booking:", error);
+    }
 }
