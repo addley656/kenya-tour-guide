@@ -5,10 +5,10 @@ function showMessage() {
 const form = document.getElementById("bookingForm");
 const bookingList = document.getElementById("bookingList");
 
-/* YOUR RENDER BACKEND URL */
+/* Render Backend URL */
 const API_URL = "https://kenya-tour-guide.onrender.com";
 
-/* LOAD BOOKINGS */
+/* Load Bookings */
 window.onload = async function () {
     try {
         const response = await fetch(`${API_URL}/bookings`);
@@ -20,12 +20,22 @@ window.onload = async function () {
             displayBooking(booking);
         });
 
+        const count = document.getElementById("bookingCount");
+        if (count) {
+            count.textContent = bookings.length;
+        }
+
+        const loading = document.getElementById("loading");
+        if (loading) {
+            loading.style.display = "none";
+        }
+
     } catch (error) {
         console.log("Error loading bookings:", error);
     }
 };
 
-/* CREATE BOOKING */
+/* Create Booking */
 form.addEventListener("submit", async function (event) {
     event.preventDefault();
 
@@ -56,12 +66,14 @@ form.addEventListener("submit", async function (event) {
 
         alert("Booking Added Successfully!");
 
+        location.reload();
+
     } catch (error) {
         console.log("Error creating booking:", error);
     }
 });
 
-/* DISPLAY BOOKING */
+/* Display Booking */
 function displayBooking(booking) {
     const div = document.createElement("div");
 
@@ -89,15 +101,19 @@ function displayBooking(booking) {
     bookingList.appendChild(div);
 }
 
-/* DELETE BOOKING */
+/* Delete Booking */
 async function deleteBooking(id, button) {
-    const confirmDelete = confirm("Are you sure you want to delete this booking?");
+
+    const confirmDelete = confirm(
+        "Are you sure you want to delete this booking?"
+    );
 
     if (!confirmDelete) {
         return;
     }
 
     try {
+
         await fetch(`${API_URL}/bookings/${id}`, {
             method: "DELETE"
         });
@@ -111,14 +127,29 @@ async function deleteBooking(id, button) {
     }
 }
 
-/* EDIT BOOKING */
-async function editBooking(id, oldName, oldDestination, oldDate) {
+/* Edit Booking */
+async function editBooking(
+    id,
+    oldName,
+    oldDestination,
+    oldDate
+) {
 
     const newName = prompt("Enter new name:", oldName);
-    const newDestination = prompt("Enter new destination:", oldDestination);
-    const newDate = prompt("Enter new date:", oldDate);
+    const newDestination = prompt(
+        "Enter new destination:",
+        oldDestination
+    );
+    const newDate = prompt(
+        "Enter new date:",
+        oldDate
+    );
 
-    if (!newName || !newDestination || !newDate) {
+    if (
+        !newName ||
+        !newDestination ||
+        !newDate
+    ) {
         return;
     }
 
@@ -129,6 +160,7 @@ async function editBooking(id, oldName, oldDestination, oldDate) {
     };
 
     try {
+
         await fetch(`${API_URL}/bookings/${id}`, {
             method: "PUT",
             headers: {
@@ -144,20 +176,38 @@ async function editBooking(id, oldName, oldDestination, oldDate) {
     } catch (error) {
         console.log("Error updating booking:", error);
     }
-}document.getElementById("searchBooking").addEventListener("keyup", function () {
+}
 
-    const search = this.value.toLowerCase();
+/* Search Bookings */
+const searchInput = document.getElementById("searchBooking");
 
-    const cards = document.querySelectorAll(".booking-card");
+if (searchInput) {
 
-    cards.forEach(card => {
+    searchInput.addEventListener(
+        "keyup",
+        function () {
 
-        if (card.textContent.toLowerCase().includes(search)) {
-            card.style.display = "block";
-        } else {
-            card.style.display = "none";
+            const search =
+                this.value.toLowerCase();
+
+            const cards =
+                document.querySelectorAll(
+                    ".booking-card"
+                );
+
+            cards.forEach(card => {
+
+                if (
+                    card.textContent
+                        .toLowerCase()
+                        .includes(search)
+                ) {
+                    card.style.display = "block";
+                } else {
+                    card.style.display = "none";
+                }
+
+            });
         }
-
-    });
-
-});
+    );
+}
