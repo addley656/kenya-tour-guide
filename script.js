@@ -144,4 +144,20 @@ async function editBooking(id, oldName, oldDestination, oldDate) {
     } catch (error) {
         console.log("Error updating booking:", error);
     }
-}
+}document.getElementById("searchBooking").addEventListener("keyup", function () {
+
+    const search = this.value.toLowerCase();
+
+    const cards = document.querySelectorAll(".booking-card");
+
+    cards.forEach(card => {
+
+        if (card.textContent.toLowerCase().includes(search)) {
+            card.style.display = "block";
+        } else {
+            card.style.display = "none";
+        }
+
+    });
+
+});
