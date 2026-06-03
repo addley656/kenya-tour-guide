@@ -112,42 +112,7 @@ app.delete("/bookings/:id", async (req, res) => {
     }
 });
 
-/* Create Admin (TEMPORARY ROUTE) */
-app.get("/create-admin", async (req, res) => {
 
-    try {
-
-        const existingAdmin =
-            await Admin.findOne({
-                username: "baraka"
-            });
-
-        if (existingAdmin) {
-            return res.send("Admin Already Exists");
-        }
-
-        const hashedPassword =
-            await bcrypt.hash(
-                "baraka123",
-                10
-            );
-
-        const admin = new Admin({
-            username: "baraka",
-            password: hashedPassword
-        });
-
-        await admin.save();
-
-        res.send("Admin Created Successfully");
-
-    } catch (error) {
-
-        res.status(500).send(error.message);
-
-    }
-
-});
 
 /* Login */
 app.post("/login", async (req, res) => {
