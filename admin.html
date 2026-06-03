@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Login</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<section class="booking">
+
+    <h2>Administrator Login</h2>
+
+    <form id="loginForm">
+
+        <input
+            type="text"
+            id="username"
+            placeholder="Username"
+            required
+        >
+
+        <input
+            type="password"
+            id="password"
+            placeholder="Password"
+            required
+        >
+
+        <button type="submit">
+            Login
+        </button>
+
+    </form>
+
+</section>
+
+<script>
+
+document.getElementById("loginForm")
+.addEventListener("submit", async function(e){
+
+    e.preventDefault();
+
+    const username =
+        document.getElementById("username").value;
+
+    const password =
+        document.getElementById("password").value;
+
+    try {
+
+        const response = await fetch(
+            "https://kenya-tour-guide.onrender.com/login",
+            {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    username,
+                    password
+                })
+            }
+        );
+
+        const data = await response.json();
+
+        if(data.token){
+
+            localStorage.setItem(
+                "token",
+                data.token
+            );
+
+            window.location.href =
+                "dashboard.html";
+
+        } else {
+
+            alert(
+                data.message ||
+                "Login Failed"
+            );
+
+        }
+
+    } catch(error){
+
+        console.log(error);
+
+        alert("Login Error");
+
+    }
+
+});
+
+</script>
+
+</body>
+</html>
