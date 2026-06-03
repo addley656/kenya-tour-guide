@@ -18,7 +18,6 @@ mongoose.connect(process.env.MONGO_URI)
     console.log("MongoDB Connected 🚀");
 })
 .catch((error) => {
-    console.error("MongoDB Connection Error:");
     console.error(error);
 });
 
@@ -60,6 +59,7 @@ app.get("/bookings", async (req, res) => {
 app.post("/bookings", async (req, res) => {
     try {
         const booking = new Booking(req.body);
+
         await booking.save();
 
         res.json({
@@ -68,9 +68,11 @@ app.post("/bookings", async (req, res) => {
         });
 
     } catch (error) {
+
         res.status(500).json({
             message: error.message
         });
+
     }
 });
 
@@ -117,44 +119,42 @@ app.delete("/bookings/:id", async (req, res) => {
     }
 });
 
-/* Register Admin */
-app.post("/register-admin", async (req, res) => {
+/* Temporary Admin Creation Route */
+app.get("/create-admin", async (req, res) => {
 
     try {
 
         const existingAdmin =
             await Admin.findOne({
-                username: req.body.username
+                username: "admin"
             });
 
         if (existingAdmin) {
-            return res.status(400).json({
-                message: "Admin already exists"
-            });
+            return res.send("Admin Already Exists");
         }
 
         const hashedPassword =
             await bcrypt.hash(
-                req.body.password,
+                "Admin123",
                 10
             );
 
         const admin = new Admin({
-            username: req.body.username,
+            username: "admin",
             password: hashedPassword
         });
 
         await admin.save();
 
-        res.json({
-            message: "Admin Created Successfully"
-        });
+        res.send(
+            "Admin Created Successfully"
+        );
 
     } catch (error) {
 
-        res.status(500).json({
-            message: error.message
-        });
+        res.status(500).send(
+            error.message
+        );
 
     }
 
@@ -214,16 +214,22 @@ app.post("/login", async (req, res) => {
 
 });
 
-/* Verify Token Middleware */
-function verifyToken(req, res, next) {
+/* Verify Token */
+function verifyToken(
+    req,
+    res,
+    next
+) {
 
     const authHeader =
         req.headers.authorization;
 
     if (!authHeader) {
+
         return res.status(401).json({
             message: "Access Denied"
         });
+
     }
 
     const token =
@@ -251,7 +257,7 @@ function verifyToken(req, res, next) {
 
 }
 
-/* Protected Admin Route */
+/* Protected Admin Dashboard */
 app.get(
     "/admin/dashboard",
     verifyToken,
@@ -267,5 +273,7 @@ app.get(
 
 /* Start Server */
 app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
+    console.log(
+        `Server running on port ${PORT}`
+    );
 });
