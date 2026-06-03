@@ -1,9 +1,12 @@
 const express = require("express");
 const cors = require("cors");
 const mongoose = require("mongoose");
+const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+const JWT_SECRET = "KenyaTourSecret2026";
 
 /* Middleware */
 app.use(cors());
@@ -26,8 +29,15 @@ const bookingSchema = new mongoose.Schema({
     date: String
 });
 
-/* Booking Model */
 const Booking = mongoose.model("Booking", bookingSchema);
+
+/* Admin Schema */
+const adminSchema = new mongoose.Schema({
+    username: String,
+    password: String
+});
+
+const Admin = mongoose.model("Admin", adminSchema);
 
 /* Home Route */
 app.get("/", (req, res) => {
@@ -40,10 +50,8 @@ app.get("/bookings", async (req, res) => {
         const bookings = await Booking.find();
         res.json(bookings);
     } catch (error) {
-        console.error(error);
         res.status(500).json({
-            message: "Error fetching bookings",
-            error: error.message
+            message: error.message
         });
     }
 });
@@ -58,11 +66,10 @@ app.post("/bookings", async (req, res) => {
             message: "Booking Saved!",
             booking
         });
+
     } catch (error) {
-        console.error(error);
         res.status(500).json({
-            message: "Error saving booking",
-            error: error.message
+            message: error.message
         });
     }
 });
@@ -70,38 +77,193 @@ app.post("/bookings", async (req, res) => {
 /* Update Booking */
 app.put("/bookings/:id", async (req, res) => {
     try {
-        const updatedBooking = await Booking.findByIdAndUpdate(
-            req.params.id,
-            req.body,
-            { new: true }
-        );
+
+        const updatedBooking =
+            await Booking.findByIdAndUpdate(
+                req.params.id,
+                req.body,
+                { new: true }
+            );
 
         res.json(updatedBooking);
+
     } catch (error) {
-        console.error(error);
+
         res.status(500).json({
-            message: "Error updating booking",
-            error: error.message
+            message: error.message
         });
+
     }
 });
 
 /* Delete Booking */
 app.delete("/bookings/:id", async (req, res) => {
     try {
-        await Booking.findByIdAndDelete(req.params.id);
+
+        await Booking.findByIdAndDelete(
+            req.params.id
+        );
 
         res.json({
             message: "Booking Deleted"
         });
+
     } catch (error) {
-        console.error(error);
+
         res.status(500).json({
-            message: "Error deleting booking",
-            error: error.message
+            message: error.message
         });
+
     }
 });
+
+/* Register Admin */
+app.post("/register-admin", async (req, res) => {
+
+    try {
+
+        const existingAdmin =
+            await Admin.findOne({
+                username: req.body.username
+            });
+
+        if (existingAdmin) {
+            return res.status(400).json({
+                message: "Admin already exists"
+            });
+        }
+
+        const hashedPassword =
+            await bcrypt.hash(
+                req.body.password,
+                10
+            );
+
+        const admin = new Admin({
+            username: req.body.username,
+            password: hashedPassword
+        });
+
+        await admin.save();
+
+        res.json({
+            message: "Admin Created Successfully"
+        });
+
+    } catch (error) {
+
+        res.status(500).json({
+            message: error.message
+        });
+
+    }
+
+});
+
+/* Admin Login */
+app.post("/login", async (req, res) => {
+
+    try {
+
+        const admin =
+            await Admin.findOne({
+                username: req.body.username
+            });
+
+        if (!admin) {
+            return res.status(401).json({
+                message: "Invalid Username"
+            });
+        }
+
+        const validPassword =
+            await bcrypt.compare(
+                req.body.password,
+                admin.password
+            );
+
+        if (!validPassword) {
+            return res.status(401).json({
+                message: "Invalid Password"
+            });
+        }
+
+        const token = jwt.sign(
+            {
+                id: admin._id,
+                username: admin.username
+            },
+            JWT_SECRET,
+            {
+                expiresIn: "1d"
+            }
+        );
+
+        res.json({
+            message: "Login Successful",
+            token
+        });
+
+    } catch (error) {
+
+        res.status(500).json({
+            message: error.message
+        });
+
+    }
+
+});
+
+/* Verify Token Middleware */
+function verifyToken(req, res, next) {
+
+    const authHeader =
+        req.headers.authorization;
+
+    if (!authHeader) {
+        return res.status(401).json({
+            message: "Access Denied"
+        });
+    }
+
+    const token =
+        authHeader.split(" ")[1];
+
+    try {
+
+        const verified =
+            jwt.verify(
+                token,
+                JWT_SECRET
+            );
+
+        req.admin = verified;
+
+        next();
+
+    } catch {
+
+        res.status(401).json({
+            message: "Invalid Token"
+        });
+
+    }
+
+}
+
+/* Protected Admin Route */
+app.get(
+    "/admin/dashboard",
+    verifyToken,
+    async (req, res) => {
+
+        const bookings =
+            await Booking.find();
+
+        res.json(bookings);
+
+    }
+);
 
 /* Start Server */
 app.listen(PORT, () => {
