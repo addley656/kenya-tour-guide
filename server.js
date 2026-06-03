@@ -18,7 +18,7 @@ mongoose.connect(process.env.MONGO_URI)
     console.log("MongoDB Connected 🚀");
 })
 .catch((error) => {
-    console.error(error);
+    console.error("MongoDB Connection Error:", error);
 });
 
 /* Booking Schema */
@@ -59,7 +59,6 @@ app.get("/bookings", async (req, res) => {
 app.post("/bookings", async (req, res) => {
     try {
         const booking = new Booking(req.body);
-
         await booking.save();
 
         res.json({
@@ -68,11 +67,9 @@ app.post("/bookings", async (req, res) => {
         });
 
     } catch (error) {
-
         res.status(500).json({
             message: error.message
         });
-
     }
 });
 
@@ -90,11 +87,9 @@ app.put("/bookings/:id", async (req, res) => {
         res.json(updatedBooking);
 
     } catch (error) {
-
         res.status(500).json({
             message: error.message
         });
-
     }
 });
 
@@ -111,22 +106,20 @@ app.delete("/bookings/:id", async (req, res) => {
         });
 
     } catch (error) {
-
         res.status(500).json({
             message: error.message
         });
-
     }
 });
 
-/* Temporary Admin Creation Route */
+/* Create Admin (TEMPORARY ROUTE) */
 app.get("/create-admin", async (req, res) => {
 
     try {
 
         const existingAdmin =
             await Admin.findOne({
-                username: "admin"
+                username: "baraka"
             });
 
         if (existingAdmin) {
@@ -135,32 +128,28 @@ app.get("/create-admin", async (req, res) => {
 
         const hashedPassword =
             await bcrypt.hash(
-                "Admin123",
+                "baraka123",
                 10
             );
 
         const admin = new Admin({
-            username: "admin",
+            username: "baraka",
             password: hashedPassword
         });
 
         await admin.save();
 
-        res.send(
-            "Admin Created Successfully"
-        );
+        res.send("Admin Created Successfully");
 
     } catch (error) {
 
-        res.status(500).send(
-            error.message
-        );
+        res.status(500).send(error.message);
 
     }
 
 });
 
-/* Admin Login */
+/* Login */
 app.post("/login", async (req, res) => {
 
     try {
@@ -215,21 +204,15 @@ app.post("/login", async (req, res) => {
 });
 
 /* Verify Token */
-function verifyToken(
-    req,
-    res,
-    next
-) {
+function verifyToken(req, res, next) {
 
     const authHeader =
         req.headers.authorization;
 
     if (!authHeader) {
-
         return res.status(401).json({
             message: "Access Denied"
         });
-
     }
 
     const token =
@@ -247,7 +230,7 @@ function verifyToken(
 
         next();
 
-    } catch {
+    } catch (error) {
 
         res.status(401).json({
             message: "Invalid Token"
@@ -257,23 +240,31 @@ function verifyToken(
 
 }
 
-/* Protected Admin Dashboard */
+/* Protected Dashboard */
 app.get(
     "/admin/dashboard",
     verifyToken,
     async (req, res) => {
 
-        const bookings =
-            await Booking.find();
+        try {
 
-        res.json(bookings);
+            const bookings =
+                await Booking.find();
+
+            res.json(bookings);
+
+        } catch (error) {
+
+            res.status(500).json({
+                message: error.message
+            });
+
+        }
 
     }
 );
 
 /* Start Server */
 app.listen(PORT, () => {
-    console.log(
-        `Server running on port ${PORT}`
-    );
+    console.log(`Server running on port ${PORT}`);
 });
