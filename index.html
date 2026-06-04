@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TembeaPwani</title>
-
     <link rel="stylesheet" href="style.css">
 </head>
 
@@ -18,6 +17,7 @@
         <ul>
             <li><a href="#home">Home</a></li>
             <li><a href="#destinations">Destinations</a></li>
+            <li><a href="#packages">Packages</a></li>
             <li><a href="#bookings">Bookings</a></li>
             <li><a href="#contact">Contact</a></li>
             <li><a href="admin.html">Admin</a></li>
@@ -29,15 +29,18 @@
     <section class="hero" id="home">
 
         <div class="hero-text">
+
             <h1>Welcome to TembeaPwani</h1>
 
             <p>
-                Explore the breathtaking Kenyan Coast, from white sandy beaches to rich Swahili culture and unforgettable adventures.
+                Explore the beauty of Kenya's Coast, from stunning beaches
+                and coral reefs to rich Swahili culture and unforgettable adventures.
             </p>
 
             <button onclick="showMessage()">
                 Book Now
             </button>
+
         </div>
 
     </section>
@@ -51,33 +54,87 @@
         <div class="cards">
 
             <div class="card">
-                <img src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=1200&auto=format&fit=crop" alt="Watamu">
 
-                <h3>Watamu</h3>
-
-                <p>
-                    Discover crystal-clear waters, coral reefs and amazing marine life.
-                </p>
-            </div>
-
-            <div class="card">
-                <img src="https://images.unsplash.com/photo-1519046904884-53103b34b206?q=80&w=1200&auto=format&fit=crop" alt="Diani Beach">
+                <img src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=1200&auto=format&fit=crop" alt="Diani Beach">
 
                 <h3>Diani Beach</h3>
 
                 <p>
-                    Relax on white sandy beaches and enjoy Kenya's most famous coastal paradise.
+                    Enjoy white sandy beaches, water sports and breathtaking sunsets.
                 </p>
+
             </div>
 
             <div class="card">
-                <img src="https://images.unsplash.com/photo-1500375592092-40eb2168fd21?q=80&w=1200&auto=format&fit=crop" alt="Malindi">
+
+                <img src="https://images.unsplash.com/photo-1500375592092-40eb2168fd21?q=80&w=1200&auto=format&fit=crop" alt="Watamu">
+
+                <h3>Watamu</h3>
+
+                <p>
+                    Discover marine parks, coral reefs and crystal-clear waters.
+                </p>
+
+            </div>
+
+            <div class="card">
+
+                <img src="https://images.unsplash.com/photo-1519046904884-53103b34b206?q=80&w=1200&auto=format&fit=crop" alt="Malindi">
 
                 <h3>Malindi</h3>
 
                 <p>
-                    Experience Swahili heritage, beautiful beaches and historic coastal attractions.
+                    Explore historical sites and the rich Swahili heritage.
                 </p>
+
+            </div>
+
+        </div>
+
+    </section>
+
+    <!-- Tour Packages -->
+
+    <section class="places" id="packages">
+
+        <h2>Our Tour Packages</h2>
+
+        <div class="cards">
+
+            <div class="card">
+
+                <img src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=1200&auto=format&fit=crop" alt="Diani Package">
+
+                <h3>Diani Beach Tour</h3>
+
+                <p>Full Day Tour</p>
+
+                <p><strong>KSh 5,000 Per Tour</strong></p>
+
+            </div>
+
+            <div class="card">
+
+                <img src="https://images.unsplash.com/photo-1500375592092-40eb2168fd21?q=80&w=1200&auto=format&fit=crop" alt="Watamu Package">
+
+                <h3>Watamu Adventure</h3>
+
+                <p>Full Day Tour</p>
+
+                <p><strong>KSh 5,000 Per Tour</strong></p>
+
+            </div>
+
+            <div class="card">
+
+                <img src="https://images.unsplash.com/photo-1519046904884-53103b34b206?q=80&w=1200&auto=format&fit=crop" alt="Malindi Package">
+
+                <h3>Malindi Heritage Tour</h3>
+
+                <p>Full Day Tour</p>
+
+                <p><strong>KSh 5,000 Per Tour</strong></p>
+
             </div>
 
         </div>
@@ -120,14 +177,6 @@
 
         <br>
 
-        <input
-            type="text"
-            id="searchInput"
-            placeholder="Search Bookings..."
-        >
-
-        <br><br>
-
         <div id="bookingList"></div>
 
     </section>
@@ -147,7 +196,7 @@
         <br>
 
         <p>
-            Explore Kenya's Coast with trusted guides and unforgettable experiences.
+            Your trusted guide to exploring Kenya's beautiful coastline.
         </p>
 
         <br>
